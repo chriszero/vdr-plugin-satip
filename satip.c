@@ -87,7 +87,10 @@ const char *cPluginSatip::CommandLineHelp(void)
          "                                define hard-coded SAT>IP server(s)\n"
          "  -D, --detach                  set the detached mode on\n"
          "  -S, --single                  set the single model server mode on\n"
-         "  -n, --noquirks                disable all the server quirks\n";
+         "  -n, --noquirks                disable all the server quirks\n"
+         "  -r, --portrange=<start>       set a range of ports used for the rt[c]p server\n"
+         "                                2 ports per device will be allocated\n"
+         "                                make sure these ports are availiable!\n";
 }
 
 bool cPluginSatip::ProcessArgs(int argc, char *argv[])
@@ -98,6 +101,7 @@ bool cPluginSatip::ProcessArgs(int argc, char *argv[])
     { "devices",  required_argument, NULL, 'd' },
     { "trace",    required_argument, NULL, 't' },
     { "server",   required_argument, NULL, 's' },
+    { "portrange",required_argument, NULL, 'r' },
     { "detach",   no_argument,       NULL, 'D' },
     { "single",   no_argument,       NULL, 'S' },
     { "noquirks", no_argument,       NULL, 'n' },
@@ -106,7 +110,7 @@ bool cPluginSatip::ProcessArgs(int argc, char *argv[])
 
   cString server;
   int c;
-  while ((c = getopt_long(argc, argv, "d:t:s:DSn", long_options, NULL)) != -1) {
+  while ((c = getopt_long(argc, argv, "d:t:s:r:DSn", long_options, NULL)) != -1) {
     switch (c) {
       case 'd':
            deviceCountM = strtol(optarg, NULL, 0);
@@ -125,6 +129,9 @@ bool cPluginSatip::ProcessArgs(int argc, char *argv[])
            break;
       case 'n':
            SatipConfig.SetDisableServerQuirks(true);
+           break;
+      case 'r':
+           SatipConfig.SetPortRange(strtol(optarg, NULL, 0));
            break;
       default:
            return false;

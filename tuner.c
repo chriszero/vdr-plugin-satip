@@ -50,13 +50,20 @@ cSatipTuner::cSatipTuner(cSatipDeviceIf &deviceP, unsigned int packetLenP)
   debug1("%s (, %d) [device %d]", __PRETTY_FUNCTION__, packetLenP, deviceIdM);
 
   // Open sockets
-  int i = 100;
-  while (i-- > 0) {
-        if (rtpM.Open(0) && rtcpM.Open(rtpM.Port() + 1))
-           break;
-        rtpM.Close();
-        rtcpM.Close();
-        }
+  if(SatipConfig.GetPortRange() == 0) {
+    int i = 100;
+    while (i-- > 0) {
+      if (rtpM.Open(0) && rtcpM.Open(rtpM.Port() + 1))
+         break;
+      rtpM.Close();
+      rtcpM.Close();
+      }
+    }
+  else {
+    unsigned int p = SatipConfig.GetPortRange() + (deviceIdM * 2);
+    rtpM.Open(p);
+    rtcpM.Open(p + 1);
+    }
   if ((rtpM.Port() <= 0) || (rtcpM.Port() <= 0)) {
      error("Cannot open required RTP/RTCP ports [device %d]", deviceIdM);
      }
